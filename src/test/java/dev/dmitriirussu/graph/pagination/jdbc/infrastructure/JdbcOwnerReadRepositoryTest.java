@@ -1,6 +1,6 @@
 package dev.dmitriirussu.graph.pagination.jdbc.infrastructure;
 
-import dev.dmitriirussu.graph.pagination.jdbc.application.pagination.PageRequest;
+import dev.dmitriirussu.graph.pagination.jdbc.application.pagination.PageQuery;
 import dev.dmitriirussu.graph.pagination.jdbc.application.pagination.PageResult;
 import dev.dmitriirussu.graph.pagination.jdbc.application.view.OwnerListView;
 import dev.dmitriirussu.graph.pagination.jdbc.application.view.OwnerView;
@@ -29,7 +29,7 @@ class JdbcOwnerReadRepositoryTest {
 
     @Test
     void findAllWithGraph_returnsRequestedPage() {
-        PageResult<OwnerView> result = repository.findAllWithGraph(new PageRequest(0, 1));
+        PageResult<OwnerView> result = repository.findAllWithGraph(new PageQuery(0, 1));
 
         assertThat(result.content()).hasSize(1);
         assertThat(result.page()).isEqualTo(0);
@@ -39,7 +39,7 @@ class JdbcOwnerReadRepositoryTest {
 
     @Test
     void findAllWithGraph_returnsOwnerWithPetsAndVisits() {
-        PageResult<OwnerView> result = repository.findAllWithGraph(new PageRequest(0, 1));
+        PageResult<OwnerView> result = repository.findAllWithGraph(new PageQuery(0, 1));
 
         OwnerView owner = result.content().get(0);
         assertThat(owner.name()).isEqualTo("jack");
@@ -49,7 +49,7 @@ class JdbcOwnerReadRepositoryTest {
 
     @Test
     void findAllWithGraph_returnsOwnerWithNoPets_onLastPage() {
-        PageResult<OwnerView> result = repository.findAllWithGraph(new PageRequest(1, 1));
+        PageResult<OwnerView> result = repository.findAllWithGraph(new PageQuery(1, 1));
 
         OwnerView owner = result.content().get(0);
         assertThat(owner.name()).isEqualTo("ann");
@@ -58,7 +58,7 @@ class JdbcOwnerReadRepositoryTest {
 
     @Test
     void findAllWithGraph_returnsEmptyContent_whenPageBeyondTotal() {
-        PageResult<OwnerView> result = repository.findAllWithGraph(new PageRequest(99, 10));
+        PageResult<OwnerView> result = repository.findAllWithGraph(new PageQuery(99, 10));
 
         assertThat(result.content()).isEmpty();
         assertThat(result.total()).isEqualTo(3);
@@ -67,7 +67,7 @@ class JdbcOwnerReadRepositoryTest {
     @Test
     void findAllWithGraph_graphIsComplete_notTruncatedByJoin() {
         // owner 'bob' has 4 pets — verifies subquery pagination doesn't truncate JOIN rows
-        PageResult<OwnerView> result = repository.findAllWithGraph(new PageRequest(2, 1));
+        PageResult<OwnerView> result = repository.findAllWithGraph(new PageQuery(2, 1));
 
         OwnerView owner = result.content().get(0);
         assertThat(owner.name()).isEqualTo("bob");
@@ -78,7 +78,7 @@ class JdbcOwnerReadRepositoryTest {
 
     @Test
     void findAllFlat_returnsRequestedPage() {
-        PageResult<OwnerListView> result = repository.findAllFlat(new PageRequest(0, 2));
+        PageResult<OwnerListView> result = repository.findAllFlat(new PageQuery(0, 2));
 
         assertThat(result.content()).hasSize(2);
         assertThat(result.page()).isEqualTo(0);
@@ -88,7 +88,7 @@ class JdbcOwnerReadRepositoryTest {
 
     @Test
     void findAllFlat_returnsPetNamesForOwner() {
-        PageResult<OwnerListView> result = repository.findAllFlat(new PageRequest(0, 1));
+        PageResult<OwnerListView> result = repository.findAllFlat(new PageQuery(0, 1));
 
         OwnerListView owner = result.content().get(0);
         assertThat(owner.name()).isEqualTo("jack");
@@ -98,7 +98,7 @@ class JdbcOwnerReadRepositoryTest {
     @Test
     void findAllFlat_returnsOwnerWithNoPets_asEmptyList() {
         // ann has 1 pet — milo
-        PageResult<OwnerListView> result = repository.findAllFlat(new PageRequest(1, 1));
+        PageResult<OwnerListView> result = repository.findAllFlat(new PageQuery(1, 1));
 
         OwnerListView owner = result.content().get(0);
         assertThat(owner.name()).isEqualTo("ann");
@@ -107,7 +107,7 @@ class JdbcOwnerReadRepositoryTest {
 
     @Test
     void findAllFlat_returnsEmptyContent_whenPageBeyondTotal() {
-        PageResult<OwnerListView> result = repository.findAllFlat(new PageRequest(99, 10));
+        PageResult<OwnerListView> result = repository.findAllFlat(new PageQuery(99, 10));
 
         assertThat(result.content()).isEmpty();
         assertThat(result.total()).isEqualTo(3);
@@ -116,7 +116,7 @@ class JdbcOwnerReadRepositoryTest {
     @Test
     void findAllFlat_petListIsComplete_notTruncatedByJoin() {
         // bob has 4 pets — verifies subquery pagination doesn't truncate JOIN rows
-        PageResult<OwnerListView> result = repository.findAllFlat(new PageRequest(2, 1));
+        PageResult<OwnerListView> result = repository.findAllFlat(new PageQuery(2, 1));
 
         OwnerListView owner = result.content().get(0);
         assertThat(owner.name()).isEqualTo("bob");

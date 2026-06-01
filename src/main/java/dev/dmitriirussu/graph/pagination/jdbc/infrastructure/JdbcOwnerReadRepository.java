@@ -1,7 +1,7 @@
 package dev.dmitriirussu.graph.pagination.jdbc.infrastructure;
 
 import dev.dmitriirussu.graph.pagination.jdbc.application.OwnerReadRepository;
-import dev.dmitriirussu.graph.pagination.jdbc.application.pagination.PageRequest;
+import dev.dmitriirussu.graph.pagination.jdbc.application.pagination.PageQuery;
 import dev.dmitriirussu.graph.pagination.jdbc.application.pagination.PageResult;
 import dev.dmitriirussu.graph.pagination.jdbc.application.view.OwnerListView;
 import dev.dmitriirussu.graph.pagination.jdbc.application.view.OwnerView;
@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * JDBC implementation of {@link OwnerReadRepository}.
@@ -61,7 +60,7 @@ public class JdbcOwnerReadRepository implements OwnerReadRepository {
     }
 
     @Override
-    public PageResult<OwnerView> findAllWithGraph(PageRequest pageRequest) {
+    public PageResult<OwnerView> findAllWithGraph(PageQuery pageRequest) {
         long total = countAll();
         List<OwnerView> content = jdbc.sql(Sql.SELECT_ALL_PAGED)
                 .param("size",   pageRequest.size())
@@ -75,7 +74,7 @@ public class JdbcOwnerReadRepository implements OwnerReadRepository {
 
     // owner + pet names only
     @Override
-    public PageResult<OwnerListView> findAllFlat(PageRequest pageRequest) {
+    public PageResult<OwnerListView> findAllFlat(PageQuery pageRequest) {
         long total = countAll();
         List<OwnerListView> content = jdbc.sql(Sql.SELECT_ALL_LIST_PAGED)
                 .param("size",   pageRequest.size())
@@ -91,8 +90,3 @@ public class JdbcOwnerReadRepository implements OwnerReadRepository {
         return jdbc.sql(Sql.COUNT_ALL).query(Long.class).single();
     }
 }
-
-/*Подзапрос IN (SELECT id FROM owners ... LIMIT/OFFSET) — ключевой приём:
-сначала получаем страницу владельцев, затем тянем их pets/visits.
-Без этого LIMIT обрезал бы строки JOIN-а, а не владельцев.
-*/
