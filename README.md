@@ -24,7 +24,7 @@ Offset-based pagination over a multi-level object graph (`owner → pets → vis
 application/
     OwnerReadRepository     ← port (interface)
     pagination/
-        PageRequest         ← pagination input
+        PageQuery           ← pagination input
         PageResult<T>       ← pagination output
     view/
         OwnerView           ← full graph read model
@@ -65,13 +65,13 @@ First select exactly N owner IDs, then fetch their full graph — no row truncat
 
 ```java
 // full graph — page 0, 1 owner per page
-repository.findAllWithGraph(new PageRequest(0, 1));
+repository.findAllWithGraph(new PageQuery(0, 1));
 
 // flat projection — page 0, 1 owner per page
-repository.findAllFlat(new PageRequest(0, 1));
+repository.findAllFlat(new PageQuery(0, 1));
 ```
 
-`PageRequest` and `PageResult` have zero framework dependencies — copy them into any Java project.
+`PageQuery` and `PageResult` have zero framework dependencies — copy them into any Java project.
 
 ## Tests
 
